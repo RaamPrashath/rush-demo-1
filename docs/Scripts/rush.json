@@ -1,0 +1,29 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+  "rushVersion": "5.177.1",
+  "pnpmVersion": "9.15.9",
+  "nodeSupportedVersionRange": ">=24.11.1 <25.0.0",
+  "projectFolderMaxDepth": 3,
+  "projects": [
+    {
+      "packageName": "app-react-one",
+      "projectFolder": "apps/app-react-one"
+    },
+    {
+      "packageName": "app-react-two",
+      "projectFolder": "apps/app-react-two"
+    },
+    {
+      "packageName": "klhrms",
+      "projectFolder": "apps/klhrms-client"
+    },
+    {
+      "packageName": "anonymous-blog",
+      "projectFolder": "apps/anonymous-blog"
+    },
+    {
+      "packageName": "client",
+      "projectFolder": "apps/sitecore/client"
+    }
+  ]
+}

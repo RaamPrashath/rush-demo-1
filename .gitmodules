@@ -1,0 +1,24 @@
+[submodule "apps/app-react-one"]
+	path = apps/app-react-one
+	url = https://github.com/RaamPrashath/app-react-one.git
+	branch = main
+[submodule "apps/app-react-two"]
+	path = apps/app-react-two
+	url = https://github.com/RaamPrashath/app-react-two.git
+	branch = main
+[submodule "apps/klhrms-client"]
+	path = apps/klhrms-client
+	url = https://github.com/RaamPrashath/KLHRMS-Client.git
+	branch = dev
+[submodule "apps/anonymous-blog"]
+	path = apps/anonymous-blog
+	url = https://github.com/RaamPrashathT/anonymous-blog.git
+	branch = main
+[submodule "apps/sitecore"]
+	path = apps/sitecore
+	url = https://github.com/RaamPrashathT/sitecore.git
+	branch = main
+[submodule "apps/nestjs-demo"]
+	path = apps/nestjs-demo
+	url = https://github.com/RaamPrashath/nestjs-demo.git
+	branch = master

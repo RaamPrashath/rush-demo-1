@@ -1,0 +1,19 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/deploy-scenario.schema.json",
+
+  "deploymentProjectNames": [
+    "app-react-one"
+  ],
+
+  "projectSettings": [
+    {
+      "projectName": "app-react-one",
+      "additionalProjectsToInclude": [
+        "app-react-two"
+      ]
+    },
+    {
+      "projectName": "app-react-two"
+    }
+  ]
+}
