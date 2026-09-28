@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
+      HRMS_API_URL: "http://localhost:8000"
+      NEXT_PUBLIC_HRMS_API_URL: "http://localhost:8000"
 
     steps:
       # Step 1: Checkout repository including ALL Git Submodules!
