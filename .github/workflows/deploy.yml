@@ -18,6 +18,7 @@ jobs:
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
       HRMS_API_URL: "http://localhost:8000"
       NEXT_PUBLIC_HRMS_API_URL: "http://localhost:8000"
+      RESEND_API_KEY: "re_build_dummy_key"
 
     steps:
       # Step 1: Checkout repository including ALL Git Submodules!
