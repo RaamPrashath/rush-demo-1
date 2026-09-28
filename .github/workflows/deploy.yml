@@ -5,7 +5,13 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch: # Allows manual trigger from GitHub UI for client presentations
+  workflow_dispatch:
+    inputs:
+      build_all:
+        description: "Force build all images regardless of changes"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -54,9 +60,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 6: Build & Push ONLY changed apps listed in deploy.json
+      # Step 6: Build & Push changed apps (and any missing initial images)
       - name: Selective Docker Build & Push
-        run: node common/scripts/build-images.js --changed-only --push --single
+        run: |
+          if [ "${{ github.event.inputs.build_all }}" = "true" ]; then
+            node common/scripts/build-images.js --push --single
+          else
+            node common/scripts/build-images.js --changed-only --push --single
+          fi
         env:
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
 

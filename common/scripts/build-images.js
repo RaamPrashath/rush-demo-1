@@ -97,19 +97,43 @@ function getDeployProjects() {
       continue;
     }
 
+    const tagBase = registryPrefix ? `${registryPrefix}/${name}` : name;
+    const fullTag = `${tagBase}:latest`;
+
     // Check if this project folder was touched by git changes (file inside or submodule pointer)
     const hasChanges = !changedOnly || changedFiles.some((f) => f.startsWith(normalizedFolder) || f === normalizedFolder);
 
+    // If --changed-only is active and project had no git changes, check if image is missing from registry
     if (changedOnly && !hasChanges) {
-      console.log(`[SKIP] Project "${name}" had no changes. Skipping.`);
-      continue;
+      let imageExists = false;
+      if (shouldPush && registryPrefix) {
+        try {
+          execSync(`docker manifest inspect ${fullTag}`, { stdio: "ignore" });
+          imageExists = true;
+        } catch {
+          imageExists = false;
+        }
+      } else {
+        try {
+          execSync(`docker image inspect ${fullTag}`, { stdio: "ignore" });
+          imageExists = true;
+        } catch {
+          imageExists = false;
+        }
+      }
+
+      if (!imageExists) {
+        console.log(`[BOOTSTRAP] Project "${name}" had no git changes, but "${fullTag}" does not exist yet. Building initial image!`);
+      } else {
+        console.log(`[SKIP] Project "${name}" had no changes and image exists. Skipping.`);
+        continue;
+      }
     }
 
-    const tagBase = registryPrefix ? `${registryPrefix}/${name}` : name;
     projects.push({
       name,
       folder,
-      imageTag: `${tagBase}:latest`
+      imageTag: fullTag
     });
   }
 
