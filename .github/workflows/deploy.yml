@@ -1,0 +1,66 @@
+name: Build & Deploy Monorepo (Selective)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Allows manual trigger from GitHub UI for client presentations
+
+permissions:
+  contents: read
+  packages: write # Needed to push Docker images to GitHub Container Registry (ghcr.io)
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository including ALL Git Submodules!
+      - name: Checkout Monorepo with Submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # Step 2: Set up Node.js runtime
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Step 3: Install dependencies using Rush
+      - name: Rush Install
+        run: node common/scripts/install-run-rush.js install
+
+      # Step 4: Smart Rush Build (topological compile with cache)
+      - name: Rush Build
+        run: node common/scripts/install-run-rush.js build
+
+      # Step 5: Log in to GitHub Container Registry (GHCR)
+      # No passwords needed! Uses the built-in GITHUB_TOKEN
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 6: Build & Push ONLY changed apps listed in deploy.json
+      - name: Selective Docker Build & Push
+        run: node common/scripts/build-images.js --changed-only --push --single
+        env:
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+
+      # Step 7: (Optional) Update Cloud Kubernetes Pod
+      # - name: Set Kubernetes Context
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: azure/k8s-set-context@v3
+      #   with:
+      #     method: kubeconfig
+      #     kubeconfig: ${{ secrets.KUBE_CONFIG }}
+      #
+      # - name: Deploy to Kubernetes Cluster
+      #   if: github.ref == 'refs/heads/main'
+      #   run: kubectl apply -f k8s/rush-pod.yaml

@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rush-monorepo-deployment
+  labels:
+    app: rush-monorepo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rush-monorepo
+  template:
+    metadata:
+      labels:
+        app: rush-monorepo
+    spec:
+      containers:
+        # 1. NestJS Backend API (simple-blog)
+        - name: nestjs-api
+          image: simple-blog:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+              name: nestjs-port
+          env:
+            - name: PORT
+              value: "5000"
+            - name: NODE_ENV
+              value: "production"
+
+        # 2. React Vite Frontend One
+        - name: app-react-one
+          image: app-react-one:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: react-one-port
+
+        # 3. React Vite Frontend Two
+        - name: app-react-two
+          image: app-react-two:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: react-two-port
+
+        # 4. Sitecore Client (React Vite)
+        - name: sitecore-client
+          image: client:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: sitecore-port
+
+        # 5. KLHRMS Next.js App
+        - name: klhrms-app
+          image: klhrms:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3003
+              name: klhrms-port
+          env:
+            - name: PORT
+              value: "3003"
+            - name: NODE_ENV
+              value: "production"
+
+        # 6. Anonymous Blog Next.js App
+        - name: anonymous-blog-app
+          image: anonymous-blog:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3004
+              name: blog-port
+          env:
+            - name: PORT
+              value: "3004"
+            - name: NODE_ENV
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rush-monorepo-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: rush-monorepo
+  ports:
+    - name: http-main
+      port: 80
+      targetPort: 80
+    - name: nestjs-api
+      port: 5000
+      targetPort: 5000
+    - name: klhrms
+      port: 3003
+      targetPort: 3003
+    - name: anonymous-blog
+      port: 3004
+      targetPort: 3004
